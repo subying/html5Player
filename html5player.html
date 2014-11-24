@@ -117,7 +117,9 @@
 
     //全屏
     function fullScreen(){
-      video.player[video.fullscreenAPI.requestFullscreen]();
+      if(video.fullscreenAPI.requestFullscreen){
+        video.player[video.fullscreenAPI.requestFullscreen]();
+      }
     }
   </script>
 </body>
