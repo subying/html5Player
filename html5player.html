@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <style>
+    .player_pad{
+      background:#333;
+      height:80px;width:640px;
+    }
+    .player_process{
+      height:20px;width:100%;
+      position:relative;
+      background:#666;
+      cursor:pointer;
+    }
+    .buffer_cover,.process_cover{
+      position:absolute;
+      left:0;top:0;
+      height:100%;width:0%;
+    }
+    .buffer_cover{
+      background:#999;
+    }
+    .process_cover{
+      background:rgba(0,0,255,0.5);
+    }
+    .time_pannel{
+      float:left;
+      margin:10px 0 0 20px;
+      color:#fff;
+    }
+    .full_ico{
+      float:right;
+      margin-top:20px;
+    }
+
+    .pad_cover{height:60px;}
+    .ico{float:left;color:#fff;margin-top:10px;}
+    .vol{
+      float:right;
+      width:80px;height:10px;
+      background:#666;
+      margin:10px 20px 0 0;
+      cursor:pointer;
+    }
+    .vol_proc{
+      width:0%;height:100%;
+      background:rgba(0,0,255,0.5);
+    }
+
+    video:-webkit-full-screen{
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" preload="auto" width="640" height="264" poster="http://219.136.253.74:82/uploadFile/2014/11/19/20141119111756363.jpg">
+    <source src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4" type='video/mp4' />
+  </video>
+
+  <div class="player_pad">
+    <div class="player_process" id="playerProc">
+      <div class="buffer_cover" id="bufferCover"></div>
+      <div class="process_cover" id="proCover"></div>
+    </div>
+
+    <div class="pad_cover">
+      <a href="javascript:;" id="btnText" onclick="playFn()" class="ico">播放</a>
+      <span class="time_pannel"><span id="useTime">00:00:00</span>/<span id="toltalTime">00:00:00</span></span>
+      <a href="javascript:;" id="btnFS" onclick="fullScreen()" class="full_ico">全屏</a>
+      <div class="vol"><div class="vol_proc" id="volProc"></div></div>
+    </div>
+  </div>
+   <br/>
+  <video controls width="640" height="264" src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4">
+    <!--
+    <source src="http://219.136.253.79:8880/hls/live-cctv1-045/stream800/index.m3u8" type='video/m3u8' />
+    -->
+  </video>
+
+  <script>
+    function htmlPlayer(id,opts){
+      //
+      if(!id) return false;
+
+      this.player = document.getElementById(id);
+
+      if(!this.player.volume){
+        return false;
+      }
+
+      this.init();
+    }
+    htmlPlayer.prototype = {
+      init:function(){
+        var _self = this
+          ,_player = _self.player
+          ,apiMap
+          ,browserApi
+          ,specApi
+          ,fullscreenAPI={}
+        ;
+
+        apiMap = [
+          // Spec: https://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html
+          [
+            'requestFullscreen',
+            'exitFullscreen',
+            'fullscreenElement',
+            'fullscreenEnabled',
+            'fullscreenchange',
+            'fullscreenerror'
+          ],
+          // WebKit
+          [
+            'webkitRequestFullscreen',
+            'webkitExitFullscreen',
+            'webkitFullscreenElement',
+            'webkitFullscreenEnabled',
+            'webkitfullscreenchange',
+            'webkitfullscreenerror'
+          ],
+          // Old WebKit (Safari 5.1)
+          [
+            'webkitRequestFullScreen',
+            'webkitCancelFullScreen',
+            'webkitCurrentFullScreenElement',
+            'webkitCancelFullScreen',
+            'webkitfullscreenchange',
+            'webkitfullscreenerror'
+          ],
+          // Mozilla
+          [
+            'mozRequestFullScreen',
+            'mozCancelFullScreen',
+            'mozFullScreenElement',
+            'mozFullScreenEnabled',
+            'mozfullscreenchange',
+            'mozfullscreenerror'
+          ],
+          // Microsoft
+          [
+            'msRequestFullscreen',
+            'msExitFullscreen',
+            'msFullscreenElement',
+            'msFullscreenEnabled',
+            'MSFullscreenChange',
+            'MSFullscreenError'
+          ]
+        ];
+        specApi = apiMap[0];
+        // determine the supported set of functions
+        for (i=0; i<apiMap.length; i++) {
+          // check for exitFullscreen function
+          if (apiMap[i][1] in document) {
+            browserApi = apiMap[i];
+            break;
+          }
+        }
+        if (browserApi) {
+          for (i=0; i<browserApi.length; i++) {
+            fullscreenAPI[specApi[i]] = browserApi[i];
+          }
+        }
+
+        _self.fullscreenAPI = fullscreenAPI;
+
+        _player.autoplay = true;
+        _player.load();
+      }
+      ,getVol:function(){//获取音量
+        //
+        var _self = this
+          ,_player = _self.player
+        ;
+        return _player.volume;
+      }
+      ,setVol:function(num){//设置音量
+        //
+        var _self = this
+          ,_player = _self.player
+        ;
+
+        if(typeof num === 'number' && num<=1){
+          _player.volume = num;
+        }
+      }
+      ,getDuration:function(){
+        var _self = this
+          ,_player = _self.player
+        ;
+        return _player.duration;
+      }
+      ,getTime:function(){//当前时间点
+        var _self = this
+          ,_player = _self.player
+        ;
+        return _player.currentTime;
+      }
+      ,setTime:function(num){//设置播放点
+        var _self = this
+          ,_player = _self.player
+        ;
+        if(typeof num === 'number'){
+          _player.currentTime = num;
+        }
+      }
+      ,checkMuted:function(){//判断是否静音
+        var _self = this
+          ,_player = _self.player
+        ;
+
+        return _player.muted;
+      }
+      ,setMuted:function(){//设置成静音
+        var _self = this
+          ,_player = _self.player
+        ;
+        _player.muted = true;
+      }
+      ,calMuted:function(){//取消静音
+        var _self = this
+          ,_player = _self.player
+        ;
+        _player.muted = false;
+      }
+      ,on:function(type,fn){
+        var _self = this
+          ,_player = _self.player
+        ;
+        if(type && typeof fn === 'function'){
+          _player.addEventListener(type,fn);
+        }
+
+        return _self;
+      }
+      ,off:function(type,fn){
+        var _self = this
+          ,_player = _self.player
+        ;
+        if(!type && typeof fn === 'function'){
+          _player.removeEventListener(type,fn);
+        }
+
+        return _self;
+      }
+      ,play:function(){
+        var _self = this
+          ,_player = _self.player
+        ;
+
+        _player.play();
+      }
+      ,pause:function(){
+        var _self = this
+          ,_player = _self.player
+        ;
+
+        _player.pause();
+      }
+      ,getBuffer:function(){
+        var _self = this
+          ,_player = _self.player
+        ;
+        return _player.buffered.end(_player.buffered.length-1);
+      }
+      ,setSrc:function(url){
+        var _self = this
+          ,_player = _self.player
+        ;
+        if(url){
+          _player.src = url;
+        }
+      }
+      ,getSrc:function(){
+        var _self = this
+          ,_player = _self.player
+        ;
+        return _player.src;
+      }
+      ,formatSecond:function(secondParam){
+        var timestamp = "00:00:00";
+        if (typeof secondParam === 'number') {
+          var second = Number(secondParam);
+          var minute = 0;
+          var hour = 0;
+          if (second >= 60) {
+            minute = Number(second / 60);
+            second = Number(second % 60);
+            if (minute >= 60) {
+              hour = Number(minute / 60);
+              minute = Number(minute % 60);
+            }
+          }
+          if (second < 10) {// 秒
+            timestamp = ":0" + parseInt(second,10);
+          } else {
+            timestamp = ":" + parseInt(second,10);
+          }
+          if (minute < 10) {// 分
+            timestamp = ":0" + parseInt(minute,10) + timestamp;
+          } else {
+            timestamp = ":" + parseInt(minute,10) + timestamp;
+          }
+          if (hour < 10) {// 时
+            timestamp = "0" + parseInt(hour,10) + timestamp;
+          } else {
+            timestamp = "" + parseInt(hour,10) + timestamp;
+          }
+        }
+        return timestamp;
+      }
+      ,getTolTimeStr:function(){
+        var _self = this
+          ,_player = _self.player
+          ,_tol = _self.getDuration()
+        ;
+        return _self.formatSecond(_tol);
+      }
+      ,getTimeStr:function(){
+        var _self = this
+          ,_player = _self.player
+          ,_time = _self.getTime()
+        ;
+        return _self.formatSecond(_time);
+      }
+    };
+
+    var video = new htmlPlayer('video')
+        ,tol = 0
+        ,playerProc = document.getElementById('playerProc')
+    ;
+
+    //播放器监听事件
+    video.on('loadedmetadata',function(){
+      tol = video.getDuration();
+
+      video.play();
+      console.log(tol);
+      document.getElementById('toltalTime').innerHTML = video.getTolTimeStr();
+    })
+    .on('progress',function(){
+      if(video.player.buffered.length){
+        var bufferTime = video.getBuffer()
+            ,bufferCover = document.getElementById('bufferCover')
+        ;
+        if(bufferTime>tol){
+          bufferTime = tol;
+        }
+        bufferCover.style.width=bufferTime*100/tol+'%';
+      }
+      
+    })
+    .on('timeupdate',function(){
+      var useTime = video.getTime()
+          ,proCover = document.getElementById('proCover')
+      ;
+      if(useTime>tol){
+        useTime = tol;
+      }
+      proCover.style.width=useTime*100/tol+'%';
+      document.getElementById('useTime').innerHTML = video.getTimeStr();
+    })
+    .on('volumechange',function(){
+      var volProc = document.getElementById('volProc');
+      volProc.style.width=video.getVol()*100+'%';
+    })
+    .on('seeked',function(){
+      console.log('seeked');
+    })
+    .on('waiting',function(){
+      console.log('waiting');
+    })
+    .on('ended',function(){
+      console.log('it is ended');
+      document.getElementById('btnText').innerHTML = '播放';
+    })
+    .on(video.fullscreenAPI.fullscreenchange,function(){
+      console.log('full screen');
+    })
+    .on('play',function(){
+      document.getElementById('btnText').innerHTML = '暂停';
+      console.log('play');
+    })
+    .on('pause',function(){
+      document.getElementById('btnText').innerHTML = '播放';
+      console.log('pause');
+    })
+    ;
+
+    //进度条点击
+    playerProc.addEventListener('click',function(e){
+      var proCover = document.getElementById('proCover')
+          ,_x = e.x || e.pageX
+          ,_per = _x/640
+          ,_stime = _per * tol
+      ;
+      proCover.style.width=_per*100+'%';
+      //video.play();
+      video.setTime(_stime);
+    });
+
+    //播放按钮
+    function playFn(){
+      if(video.player.paused){
+        video.play();
+      }else{
+        video.pause();
+      }
+    }
+
+    //全屏
+    function fullScreen(){
+      video.player[video.fullscreenAPI.requestFullscreen]();
+    }
+  </script>
+</body>
+</html>
