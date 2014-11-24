@@ -3,57 +3,7 @@
 <head>
   <title>Video</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <style>
-    .player_pad{
-      background:#333;
-      height:80px;width:640px;
-    }
-    .player_process{
-      height:20px;width:100%;
-      position:relative;
-      background:#666;
-      cursor:pointer;
-    }
-    .buffer_cover,.process_cover{
-      position:absolute;
-      left:0;top:0;
-      height:100%;width:0%;
-    }
-    .buffer_cover{
-      background:#999;
-    }
-    .process_cover{
-      background:rgba(0,0,255,0.5);
-    }
-    .time_pannel{
-      float:left;
-      margin:10px 0 0 20px;
-      color:#fff;
-    }
-    .full_ico{
-      float:right;
-      margin-top:20px;
-    }
-
-    .pad_cover{height:60px;}
-    .ico{float:left;color:#fff;margin-top:10px;}
-    .vol{
-      float:right;
-      width:80px;height:10px;
-      background:#666;
-      margin:10px 20px 0 0;
-      cursor:pointer;
-    }
-    .vol_proc{
-      width:0%;height:100%;
-      background:rgba(0,0,255,0.5);
-    }
-
-    video:-webkit-full-screen{
-      width: 100% !important;
-      height: 100% !important;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <video id="video" preload="auto" width="640" height="264" poster="http://219.136.253.74:82/uploadFile/2014/11/19/20141119111756363.jpg">
