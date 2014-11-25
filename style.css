@@ -51,12 +51,23 @@
   background:rgba(0,0,255,0.5);
 }
 
-video:-webkit-full-screen{
-  width: 100% !important;
-  height: 100% !important;
-  z-index:99999;
+.full_screen{
+	width:100%;
+	height:100%;
+	position:absolute;
+	left:0;top:0;
+	background:#000;
 }
-
-video::-webkit-media-controls {
-  display:none !important;
+.full_screen video{ 
+	width:auto;
+	height:100%;
+	margin:0 auto;
+}
+.full_screen .player_pad{ 
+	position:absolute;
+	left:0;bottom:0;
+	display:none;
+}
+.full_screen:hover .player_pad{ 
+	display:block;
 }

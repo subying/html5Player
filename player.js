@@ -91,37 +91,6 @@ htmlPlayer.prototype = {
     _player.autoplay = true;
     _player.load();
   }
-  ,requestFullscreen:function(){//全屏
-    var _self = this
-        ,_apiMap = _self.fullscreenAPI
-        ,_player = _self.player
-    ;
-    if(_self.isFullScreen) return false;
-
-    if(_apiMap.requestFullscreen){
-        _player[_apiMap.requestFullscreen]();
-    }else{
-      console.log('full');
-    }
-
-    _self.isFullScreen = true;
-  }
-  ,exitFullscreen:function(){//退出全屏
-    var _self = this
-        ,_apiMap = _self.fullscreenAPI
-        ,_player = _self.player
-        ,_fn = _player[_apiMap.exitFullscreen]
-    ;
-    if(!_self.isFullScreen) return false;
-
-    if(_apiMap.exitFullscreen){
-        _player[_apiMap.exitFullscreen]();
-    }else{
-      console.log('exit');
-    }
-
-    _self.isFullScreen = false;
-  }
   ,getVol:function(){//获取音量
     //
     var _self = this

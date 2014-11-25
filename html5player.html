@@ -7,8 +7,9 @@
 </head>
 <body>
   <div class="player_main" id="mainPlayer">
-    <video id="video" preload="auto" poster="http://219.136.253.74:82/uploadFile/2014/11/19/20141119111756363.jpg">
-      <source src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4" type='video/mp4' />
+  	<!-- controls 属性来控制是否显示控制栏   poster来显示视频默认图片 -->
+    <video id="video" preload="auto" poster="">
+      <source src="http://www.w3cschool.cc/try/demo_source/mov_bbb.mp4" type='video/mp4' />
     </video>
     <div class="player_pad">
       <div class="player_process" id="playerProc">
@@ -27,7 +28,7 @@
   </div>
    <br/>
    <!--
-    <video controls width="640" height="264" src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4"></video>
+    <video controls width="640" height="264" src="http://www.w3cschool.cc/try/demo_source/mov_bbb.mp4"></video>
   -->
 
   <script src="player.js"></script>
@@ -130,19 +131,30 @@
       }
     });
 
-    //全屏
+    /*
+		全屏
+		针对video的父级DIV全屏  然后通过样式来控制视频的大小
+    */
     $fullScreenBtn.on('click',function(){
       var _cover = $mainPlayer[0];
       if(!video.isFullScreen){
         //video.requestFullscreen();
         _cover[video.fullscreenAPI.requestFullscreen]();
         video.isFullScreen = true;
+        $mainPlayer.addClass('full_screen');
       }else{
         //video.exitFullscreen();
         document[video.fullscreenAPI.exitFullscreen]();
         video.isFullScreen = false;
+        $mainPlayer.removeClass('full_screen');
       }
+
+      fullScreenchange();
     });
+
+    function fullScreenchange(){ 
+    	//
+    }
   </script>
 </body>
 </html>
