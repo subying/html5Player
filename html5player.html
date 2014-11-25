@@ -6,121 +6,143 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <video id="video" preload="auto" width="640" height="264" poster="http://219.136.253.74:82/uploadFile/2014/11/19/20141119111756363.jpg">
-    <source src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4" type='video/mp4' />
-  </video>
+  <div class="player_main" id="mainPlayer">
+    <video id="video" preload="auto" poster="http://219.136.253.74:82/uploadFile/2014/11/19/20141119111756363.jpg">
+      <source src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4" type='video/mp4' />
+    </video>
+    <div class="player_pad">
+      <div class="player_process" id="playerProc">
+        <div class="buffer_cover" id="bufferCover"></div>
+        <div class="process_cover" id="proCover"></div>
+      </div>
 
-  <div class="player_pad">
-    <div class="player_process" id="playerProc">
-      <div class="buffer_cover" id="bufferCover"></div>
-      <div class="process_cover" id="proCover"></div>
-    </div>
+      <div class="pad_cover">
+        <a href="javascript:;" id="playBtn" class="ico">播放</a>
+        <span class="time_pannel"><span id="useTime">00:00:00</span>/<span id="toltalTime">00:00:00</span></span>
 
-    <div class="pad_cover">
-      <a href="javascript:;" id="btnText" onclick="playFn()" class="ico">播放</a>
-      <span class="time_pannel"><span id="useTime">00:00:00</span>/<span id="toltalTime">00:00:00</span></span>
-      <a href="javascript:;" id="btnFS" onclick="fullScreen()" class="full_ico">全屏</a>
-      <div class="vol"><div class="vol_proc" id="volProc"></div></div>
+        <a href="javascript:;" id="fullScreenBtn" class="full_ico">全屏</a>
+        <div class="vol"><div class="vol_proc" id="volProc"></div></div>
+      </div>
     </div>
   </div>
    <br/>
-  <video controls width="640" height="264" src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4">
-    <!--
-    <source src="http://219.136.253.79:8880/hls/live-cctv1-045/stream800/index.m3u8" type='video/m3u8' />
-    -->
-  </video>
+   <!--
+    <video controls width="640" height="264" src="http://video3.utvgo.com:17553/800/PCyule/ylxtd2014111902.mp4"></video>
+  -->
 
   <script src="player.js"></script>
+  <script src='jquery-1.11.1.min.js'></script>
   <script>
     var video = new htmlPlayer('video')
         ,tol = 0
-        ,playerProc = document.getElementById('playerProc')
+        ,$playerProc = $('#playerProc')
+        ,$fullScreenBtn = $('#fullScreenBtn')
+        ,$playBtn = $('#playBtn')
+        ,$mainPlayer = $('#mainPlayer')
     ;
 
-    //播放器监听事件
-    video.on('loadedmetadata',function(){
-      tol = video.getDuration();
+    function listenVideo(){
+      //播放器监听事件
+      video.on('loadedmetadata',function(){//加载meta data 完成，可以获取总时长
+          tol = video.getDuration();
 
-      video.play();
-      console.log(tol);
-      document.getElementById('toltalTime').innerHTML = video.getTolTimeStr();
-    })
-    .on('progress',function(){
-      if(video.player.buffered.length){
-        var bufferTime = video.getBuffer()
-            ,bufferCover = document.getElementById('bufferCover')
-        ;
-        if(bufferTime>tol){
-          bufferTime = tol;
-        }
-        bufferCover.style.width=bufferTime*100/tol+'%';
-      }
-      
-    })
-    .on('timeupdate',function(){
-      var useTime = video.getTime()
-          ,proCover = document.getElementById('proCover')
+          video.play();
+          console.log(tol);
+          document.getElementById('toltalTime').innerHTML = video.getTolTimeStr();
+        })
+        //加载进度  用于判断缓冲了多少
+        .on('progress',function(){
+          if(video.player.buffered.length){
+            var bufferTime = video.getBuffer()
+                ,bufferCover = document.getElementById('bufferCover')
+            ;
+            if(bufferTime>tol){
+              bufferTime = tol;
+            }
+            bufferCover.style.width=bufferTime*100/tol+'%';
+          }
+        })
+        //播放时间点改变
+        .on('timeupdate',function(){
+          var useTime = video.getTime()
+              ,proCover = document.getElementById('proCover')
+          ;
+          if(useTime>tol){
+            useTime = tol;
+          }
+          proCover.style.width=useTime*100/tol+'%';
+          document.getElementById('useTime').innerHTML = video.getTimeStr();
+        })
+        //改变音量
+        .on('volumechange',function(){
+          var volProc = document.getElementById('volProc');
+          volProc.style.width=video.getVol()*100+'%';
+        })
+        //跳跃  改变时间点
+        .on('seeked',function(){
+          console.log('seeked');
+        })
+        //等待
+        .on('waiting',function(){
+          console.log('waiting');
+        })
+        //播放结束
+        .on('ended',function(){
+          console.log('it is ended');
+          $playBtn.html('播放');
+        })
+        .on(video.fullscreenAPI.fullscreenchange,function(){
+          console.log('full screen');
+        })
+        //播放状态
+        .on('play',function(){
+          $playBtn.html('暂停');
+          console.log('play');
+        })
+        //暂停状态
+        .on('pause',function(){
+          $playBtn.html('播放');
+          console.log('pause');
+        })
       ;
-      if(useTime>tol){
-        useTime = tol;
-      }
-      proCover.style.width=useTime*100/tol+'%';
-      document.getElementById('useTime').innerHTML = video.getTimeStr();
-    })
-    .on('volumechange',function(){
-      var volProc = document.getElementById('volProc');
-      volProc.style.width=video.getVol()*100+'%';
-    })
-    .on('seeked',function(){
-      console.log('seeked');
-    })
-    .on('waiting',function(){
-      console.log('waiting');
-    })
-    .on('ended',function(){
-      console.log('it is ended');
-      document.getElementById('btnText').innerHTML = '播放';
-    })
-    .on(video.fullscreenAPI.fullscreenchange,function(){
-      console.log('full screen');
-    })
-    .on('play',function(){
-      document.getElementById('btnText').innerHTML = '暂停';
-      console.log('play');
-    })
-    .on('pause',function(){
-      document.getElementById('btnText').innerHTML = '播放';
-      console.log('pause');
-    })
-    ;
+    }
+
+    listenVideo();
 
     //进度条点击
-    playerProc.addEventListener('click',function(e){
-      var proCover = document.getElementById('proCover')
-          ,_x = e.x || e.pageX
-          ,_per = _x/640
+    $playerProc.on('click',function(e){
+      var proCover = $('#proCover')
+          ,_x = e.offsetX
+          ,_w = $playerProc.width()
+          ,_per = _x/_w
           ,_stime = _per * tol
       ;
-      proCover.style.width=_per*100+'%';
-      //video.play();
+      proCover.css('width',_per*100+'%');
       video.setTime(_stime);
     });
 
     //播放按钮
-    function playFn(){
+    $playBtn.on('click',function(){
       if(video.player.paused){
         video.play();
       }else{
         video.pause();
       }
-    }
+    });
 
     //全屏
-    function fullScreen(){
-      if(video.fullscreenAPI.requestFullscreen){
-        video.player[video.fullscreenAPI.requestFullscreen]();
+    $fullScreenBtn.on('click',function(){
+      var _cover = $mainPlayer[0];
+      if(!video.isFullScreen){
+        //video.requestFullscreen();
+        _cover[video.fullscreenAPI.requestFullscreen]();
+        video.isFullScreen = true;
+      }else{
+        //video.exitFullscreen();
+        document[video.fullscreenAPI.exitFullscreen]();
+        video.isFullScreen = false;
       }
-    }
+    });
   </script>
 </body>
 </html>

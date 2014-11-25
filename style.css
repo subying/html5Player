@@ -1,6 +1,14 @@
+.player_main{
+  width:600px;
+  margin:0 auto;
+}
+.player_main video{
+  width:100%;
+  display:block;
+}
 .player_pad{
   background:#333;
-  height:80px;width:640px;
+  height:80px;width:100%;
 }
 .player_process{
   height:20px;width:100%;
@@ -46,4 +54,9 @@
 video:-webkit-full-screen{
   width: 100% !important;
   height: 100% !important;
+  z-index:99999;
+}
+
+video::-webkit-media-controls {
+  display:none !important;
 }
