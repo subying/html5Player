@@ -5,10 +5,12 @@ function htmlPlayer(id,opts){
   this.player = document.getElementById(id);
 
   if(!this.player.volume){
+  	this.enabled = false;
     return false;
   }
 
   this.opts = opts;
+  this.enabled = true;
 
   this.init();
 }

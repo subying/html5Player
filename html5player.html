@@ -108,49 +108,61 @@
       ;
     }
 
-    listenVideo();
 
-    //进度条点击
-    $playerProc.on('click',function(e){
-      var proCover = $('#proCover')
-          ,_x = e.offsetX
-          ,_w = $playerProc.width()
-          ,_per = _x/_w
-          ,_stime = _per * tol
-      ;
-      proCover.css('width',_per*100+'%');
-      video.setTime(_stime);
-    });
+    function listenPad(){ 
+    	//进度条点击
+	    $playerProc.on('click',function(e){
+	      var proCover = $('#proCover')
+	          ,_x = e.offsetX
+	          ,_w = $playerProc.width()
+	          ,_per = _x/_w
+	          ,_stime = _per * tol
+	      ;
+	      proCover.css('width',_per*100+'%');
+	      video.setTime(_stime);
+	    });
 
-    //播放按钮
-    $playBtn.on('click',function(){
-      if(video.player.paused){
-        video.play();
-      }else{
-        video.pause();
-      }
-    });
+	    //播放按钮
+	    $playBtn.on('click',function(){
+	      if(video.player.paused){
+	        video.play();
+	      }else{
+	        video.pause();
+	      }
+	    });
 
-    /*
-		全屏
-		针对video的父级DIV全屏  然后通过样式来控制视频的大小
-    */
-    $fullScreenBtn.on('click',function(){
-      var _cover = $mainPlayer[0];
-      if(!video.isFullScreen){
-        //video.requestFullscreen();
-        _cover[video.fullscreenAPI.requestFullscreen]();
-        video.isFullScreen = true;
-        $mainPlayer.addClass('full_screen');
-      }else{
-        //video.exitFullscreen();
-        document[video.fullscreenAPI.exitFullscreen]();
-        video.isFullScreen = false;
-        $mainPlayer.removeClass('full_screen');
-      }
+	    /*
+			全屏
+			针对video的父级DIV全屏  然后通过样式来控制视频的大小
+	    */
+	    $fullScreenBtn.on('click',function(){
+	      var _cover = $mainPlayer[0];
+	      if(!video.isFullScreen){
+	        //video.requestFullscreen();
+	        if(video.fullscreenAPI.requestFullscreen){
+	        	_cover[video.fullscreenAPI.requestFullscreen]();
+	    	}
 
-      fullScreenchange();
-    });
+	        video.isFullScreen = true;
+	        $mainPlayer.addClass('full_screen');
+	      }else{
+	        //video.exitFullscreen();
+	        if(video.fullscreenAPI.exitFullscreen){
+	        	document[video.fullscreenAPI.exitFullscreen]();
+	    	}
+
+	        video.isFullScreen = false;
+	        $mainPlayer.removeClass('full_screen');
+	      }
+
+	      fullScreenchange();
+	    });
+    }
+
+    if(video.enabled){ 
+    	listenVideo();
+    	listenPad();
+    }
 
     function fullScreenchange(){ 
     	//
