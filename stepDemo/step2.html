@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video step2</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+    <video id="myVideo" controls preload="auto" width=300 height="165" 
+    	poster="http://img0.ph.126.net/I10JqUUJDmlEtE_XYl4hOg==/6608842237655242020.jpg" 
+    	src="http://www.w3cschool.cc/try/demo_source/mov_bbb.mp4">
+    </video>
+    <script>
+    	var myVideo = document.getElementById('myVideo')//获取video元素
+    		,tol = 0 //总时长
+    	;
+    	myVideo.addEventListener("loadedmetadata", function(){
+		  tol = myVideo.duration;//获取总时长
+		});
+
+		//播放
+		function play(){ 
+			myVideo.play();
+		}
+
+		//暂停
+		function pause(){ 
+			myVideo.pause();
+		}
+
+		//播放时间点更新时
+		myVideo.addEventListener("timeupdate", function(){
+		  var currentTime = myVideo.currentTime;//获取当前播放时间
+		  console.log(currentTime);//在调试器中打印
+		});
+
+		//设置播放点
+		function playBySeconds(num){ 
+			myVideo.currentTime = num;
+		}
+
+		//音量改变时
+		myVideo.addEventListener("volumechange", function(){
+		  var volume = myVideo.volume;//获取当前音量
+		  console.log(volume);//在调试器中打印
+		});
+
+		//设置音量
+		function setVol(num){ 
+			myVideo.volume = num;
+		}
+    </script>
+</body>
+</html>
